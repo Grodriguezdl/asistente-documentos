@@ -1,6 +1,12 @@
-from fastapi import FastAPI
+from typing import Annotated
+
+from fastapi import Depends, FastAPI
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.db import get_db
 
 app = FastAPI(
     title=settings.nombre_app,
@@ -10,6 +16,21 @@ app = FastAPI(
 
 
 @app.get("/api/salud", tags=["Sistema"])
-def salud() -> dict[str, str]:
-    """Indica si la API está funcionando."""
-    return {"estado": "ok", "entorno": settings.entorno}
+def salud(db: Annotated[Session, Depends(get_db)]) -> dict[str, str]:
+    """Indica si la API funciona y si la base de datos y pgvector están disponibles."""
+    try:
+        version = db.execute(
+            text("SELECT extversion FROM pg_extension WHERE extname = 'vector'")
+        ).scalar()
+        base_de_datos = "ok"
+        pgvector = version or "no instalado"
+    except SQLAlchemyError:
+        base_de_datos = "sin conexión"
+        pgvector = "desconocido"
+
+    return {
+        "estado": "ok",
+        "entorno": settings.entorno,
+        "base_de_datos": base_de_datos,
+        "pgvector": pgvector,
+    }
