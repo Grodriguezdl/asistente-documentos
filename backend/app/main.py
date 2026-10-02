@@ -7,13 +7,13 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.db import get_db
-
+from app.routers import documentos
 app = FastAPI(
     title=settings.nombre_app,
     version="0.1.0",
     description="API que responde preguntas sobre documentos usando IA, citando la fuente.",
 )
-
+app.include_router(documentos.router)
 
 @app.get("/api/salud", tags=["Sistema"])
 def salud(db: Annotated[Session, Depends(get_db)]) -> dict[str, str]:
