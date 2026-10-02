@@ -1,0 +1,19 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.ruff_cache/
+
+# Secretos
+.env
+.env.*
+!.env.example
+
+# Documentos subidos durante el desarrollo
+backend/almacenamiento/
+
+# Sistema operativo y editores
+.DS_Store
+Thumbs.db
+.vscode/
